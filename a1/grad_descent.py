@@ -218,6 +218,54 @@ def grad_descent(h, grad_h, loss_f, grad_loss_f, x, y, steps):
     # operations or numpy vectorization
     # return np.zeros((1,))
 
+    # n =len(y)
+    # losses = []
+    # theta = np.random.randm(y.size)
+    # max_iterations = 100
+    # theta = np.reshape(theta, (-1, 2))
+    # for i in range(max_iterations):
+    #     losses.append(l2_loss(h, grad_h, theta, x, y))
+    #     weights = weights - 1/n* (grad_loss_f(h, grad_h, theta, x, y))
+    #     gradient_at_x = 
+
+    loss_history = np.zeros(20)
+    theta_history = np.zeros((20, x.shape[1])) 
+    theta = np.random.randn(1, x.shape[1])
+
+    print(theta.shape)
+
+    #print('___________'+ str(theta.size) + ' ' + str(x.size) + ' ' + str(y.size))
+    
+    for i in range(20): # number of training iterations? 
+
+        prediction = h(theta, x)
+        print('________')
+        #print('x size: ' + str(x.size))
+        #print('x shape: '+ str(x.shape))
+        #print ('prediction shape ' + str(prediction.shape)) 
+        #print('y shape: ' + str(y.shape))
+        #print('y.size: '+ str(y.size))
+        print('grad loss: ' +str(grad_loss_f(h, grad_h, theta, x, y)))
+        print('loss: '+ str(loss_f(h, grad_h, theta, x, y) ))
+
+        #print('loss:' + str(loss_f()))
+        print('theta: '+ str(theta))
+        theta = theta - 0.001 * grad_loss_f(h, grad_h, theta, x, y)
+
+        theta_history[i, : ] = theta.T #transposes theta array
+    
+        loss_history[i] = loss_f(h, grad_h, theta, x, y) 
+
+    print(loss_history)        
+    
+    #return tuple[weights,
+    
+    # TODO 1: Write the traditional gradient descent algorithm without matrix
+    # operations or numpy vectorization
+    # return np.zeros((1,))
+
+    return (theta, theta_history)
+
 
 def stochastic_grad_descent(h, grad_h, loss_f, grad_loss_f, x, y, steps):
     """grad_descent: gradient descent algorithm on a hypothesis class.
@@ -260,7 +308,37 @@ def stochastic_grad_descent(h, grad_h, loss_f, grad_loss_f, x, y, steps):
     """
 
     # TODO 2
-    return np.zeros((1,))
+    loss_history = np.zeros(20) #hard coded for testing, can replace with steps param 
+    theta_history = np.zeros((20, x.shape[1])) 
+
+    theta = np.random.randn(1, x.shape[1])
+    
+    # print("______" + str(x.shape))
+    # print("______" + str(y.shape))
+    # print("______" + str(theta.shape))
+
+    #print('___________'+ str(theta.size) + ' ' + str(x.size) + ' ' + str(y.size))
+
+    for i in range(20): # number of training iterations? 
+        #for j in range(x.shape[0])
+        
+        prediction = h(theta, x)
+        #print(i)
+        #print (prediction.shape) 
+        #print("______" + str(grad_loss_f(h, grad_h, theta, x, y).shape))
+
+        j = np.random.randint(0, x.shape[0], 1)
+        theta = theta - 0.001 * grad_loss_f(h, grad_h, theta, x[j], y[j])
+
+        #print("grad loss for it " + str(i) + str(grad_loss_f(h, grad_h, theta, x, y))) 
+
+        theta_history[i, : ] = theta.T #transposes theta array
+    
+        loss_history[i] = loss_f(h, grad_h, theta, x, y)
+        
+    print("SGD test")
+    print(loss_history)
+    return (theta, theta_history)
 
 
 def minibatch_grad_descent(h, grad_h, loss_f, grad_loss_f, x, y, steps):
@@ -305,7 +383,45 @@ def minibatch_grad_descent(h, grad_h, loss_f, grad_loss_f, x, y, steps):
 
     # TODO 3: Write the stochastic mini-batch gradient descent algorithm without 
     # matrix operations or numpy vectorization
-    return np.zeros((1,))
+
+    loss_history = np.zeros(20) #hard coded for testing, can replace with steps param 
+    theta_history = np.zeros((20, x.shape[1])) 
+
+    theta = np.random.randn(1, x.shape[1])
+    
+    # print("______" + str(x.shape))
+    # print("______" + str(y.shape))
+    # print("______" + str(theta.shape))
+
+    #print('___________'+ str(theta.size) + ' ' + str(x.size) + ' ' + str(y.size))
+
+    batch = 7
+    batches = int(x.shape[0]/batch)
+    current = np.random.randint(0,batch,1)
+
+    
+    for i in range(20): # number of training iterations? 
+        #for j in range(x.shape[0])
+
+        prediction = h(theta, x)
+        #print(i)
+        #print (prediction.shape) 
+        #print("______" + str(grad_loss_f(h, grad_h, theta, x, y).shape))
+        for j in range(batches):
+            #theta = theta - 0.0001 * grad_loss_f(h, grad_h, theta, x[j], y[j])
+
+            #j = np.random.randint(0, x.shape[0], 1)
+            theta = theta - 0.001 * grad_loss_f(h, grad_h, theta, x[current*batches+j], y[current*batches+j])
+
+            #print("grad loss for it " + str(i) + str(grad_loss_f(h, grad_h, theta, x, y))) 
+
+        theta_history[i, : ] = theta.T #transposes theta array
+        
+        loss_history[i] = loss_f(h, grad_h, theta, x, y)
+        
+    print("Minibatch test")
+    print(loss_history)
+    return (theta, theta_history)
 
 
 def matrix_gd(h, grad_h, loss_f, grad_loss_f, x, y, steps, batch_size):
@@ -457,33 +573,27 @@ def save_linear_gif():
     y = 2*np.arange(-3, 4, 0.1).reshape((-1, 1))
     x_support = np.array((0, 4))
     y_support = np.array((-0.1, 200))
-    plot_linear_1d(
-        linear_h,
-        linear_grad_h,
-        l2_loss,
-        grad_l2_loss,
-        x,
-        y,
-        grad_descent,
-        x_support,
-        y_support
-    )
-    plot_grad_descent_1d(
-        linear_h,
-        linear_grad_h,
-        l2_loss,
-        grad_l2_loss,
-        x,
-        y,
-        grad_descent,
-        x_support,
-        y_support
-    )
+
+    plot_linear_1d(linear_h, linear_grad_h, l2_loss, grad_l2_loss, x,
+        y, grad_descent, x_support, y_support)
+
+    plot_grad_descent_1d(linear_h, linear_grad_h, l2_loss, grad_l2_loss,
+        x, y, grad_descent, x_support, y_support)
 
 
-def test_gd(grad_des_f):
+def test_gd(grad_descent):
+    h = linear_h
+    grad_h = linear_grad_h
+    loss_f = l2_loss
+    grad_loss_f = grad_l2_loss
+    x = np.arange(-3, 4, 0.1).reshape((-1, 1))
+    y = 2*np.arange(-3, 4, 0.1).reshape((-1, 1))
+    steps = 100
+
+    grad_descent(h, grad_h, loss_f, grad_loss_f, x, y, steps)
     pass
 
+test_gd(minibatch_grad_descent)
 
-if __name__ == "__main__":
-    save_linear_gif()
+# if __name__ == "__main__":
+#     save_linear_gif()
